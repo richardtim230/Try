@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Support System</title>
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+  <style>
+    /* General styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #eef2f7;
+      color: #333;
+    }
+
+    header {
+      background: linear-gradient(90deg, #4a90e2, #0055cc);
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    header h1, header h2 {
+      margin: 5px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .forum-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .forum-modal-content {
+      background: white;
+      color: #333;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 800px;
+      width: 90%;
+      overflow-y: auto;
+      max-height: 80%;
+    }
+
+    .topic {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background: #f0f4fa;
+    }
+
+    .topic h4 {
+      margin: 0;
+    }
+
+    .comments {
+      margin-top: 10px;
+      padding-left: 20px;
+      border-left: 2px solid #ddd;
+    }
+
+    .comments p {
+      margin: 5px 0;
+    }
+
+    textarea, input, button, select {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+
+    button {
+      background-color: #0055cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #003b8a;
+    }
+
+    /* Floating Button */
+    .floating-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #0055cc;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+      text-align: center;
+      line-height: 60px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      transition: background 0.3s ease;
+    }
+
+    .floating-button:hover {
+      background: #003b8a;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Obafemi Awolowo University</h1>
+    <h2>Student Support System</h2>
+  </header>
+
+  <div class="container">
+    <h3>Welcome to the Student Support System</h3>
+    <p>Use the floating button below to access the discussion forum.</p>
+  </div>
+
+  <!-- Floating Button -->
+  <button class="floating-button" onclick="toggleForum()">💬</button>
+
+  <!-- Forum Modal -->
+  <div class="forum-modal" id="forumModal">
+    <div class="forum-modal-content">
+      <h3>Discussion Forum</h3>
+      <div id="loginSection">
+        <p>Tutors, please log in. Users, enter your name to join discussions.</p>
+        <input type="text" id="username" placeholder="Enter your name or tutor username">
+        <input type="password" id="password" placeholder="Enter password (for tutors only)">
+        <button onclick="login()">Join Forum</button>
+      </div>
+      <div id="forumSection" style="display: none;">
+        <div id="postSection" style="display: none;">
+          <h4>Create a Topic</h4>
+          <select id="categorySelect">
+            <option value="Faculty of Science">Faculty of Science</option>
+            <option value="College of Health Sciences">College of Health Sciences</option>
+            <option value="Pharmacy">Pharmacy</option>
+            <option value="Agriculture with Tech">Agriculture with Tech</option>
+            <option value="General Discussions">General Discussions</option>
+          </select>
+          <input type="text" id="topicTitle" placeholder="Topic Title">
+          <textarea id="topicContent" placeholder="Topic Content"></textarea>
+          <button onclick="createTopic()">Post Topic</button>
+        </div>
+        <div id="topicsContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Predefined tutors
+    const tutors = [
+      { username: 'tutor1', password: 'pass1' },
+      { username: 'tutor2', password: 'pass2' },
+      { username: 'tutor3', password: 'pass3' },
+      { username: 'tutor4', password: 'pass4' },
+      { username: 'tutor5', password: 'pass5' },
+    ];
+    let currentUser = null;
+
+    // Toggle Forum Modal
+    function toggleForum() {
+      const forumModal = document.getElementById('forumModal');
+      forumModal.style.display = forumModal.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    // Login Functionality
+    function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const tutor = tutors.find(t => t.username === username && t.password === password);
+
+      if (tutor) {
+        alert('Welcome, Tutor!');
+        currentUser = username;
+        document.getElementById('postSection').style.display = 'block';
+      } else if (username) {
+        alert(`Welcome, ${username}!`);
+        currentUser = username;
+      } else {
+        alert('Please enter your name to join the forum.');
+        return;
+      }
+
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('forumSection').style.display = 'block';
+      loadTopics();
+    }
+
+    // Load Topics
+    function loadTopics() {
+      const topics = JSON.parse(localStorage.getItem('topics')) || [];
+      const topicsContainer = document.getElementById('topicsContainer');
+
+      if (topics.length === 0) {
+        topicsContainer.innerHTML = '<p>No topics available. Be the first to post!</p>';
+        return;
+      }
+
+      topicsContainer.innerHTML = topics.map((topic, index) => `
+        <div class="topic">
+          <h4>${topic.title} (${topic.category})</h4>
+          <p>${topic.content}</p>
+          <div class="comments">
+            ${topic.comments.map(c => `<p><strong>${c.username}:</strong> ${c.comment}</p>`).join('')}
+          </div>
+          <textarea id="commentInput${index}" placeholder="Add a comment"></textarea>
+          <button onclick="addComment(${index})">Comment</button>
+        </div>
+      `).join('');
+    }
+
+    // Create Topic
+    function createTopic() {
+      const category = document.getElementById('categorySelect').value;
+      const title = document.getElementById('topicTitle').value.trim();
+      const content = document.getElementById('topicContent').value.trim();
+
+      if (!category || !title || !content) {
+        alert('All fields are required!');
+        return;
+      }
+
+      const topics = JSON.parse(localStorage.getItem('topics')) || [];
+      topics.push({ category, title, content, comments: [] });
+      localStorage.setItem('topics', JSON.stringify(topics));
+      alert('Topic created successfully!');
+      loadTopics();
+    }
+
+    // Add Comment
+    function addComment(index) {
+      const commentInput = document.getElementById(`commentInput${index}`);
+      const comment = commentInput.value.trim();
+
+      if (!comment) {
+        alert('Comment cannot be empty!');
+        return;
+      }
+
+      const topics = JSON.parse(localStorage.getItem('topics')) || [];
+      topics[index].comments.push({ username: currentUser, comment });
+      localStorage.setItem('topics', JSON.stringify(topics));
+      commentInput.value = '';
+      loadTopics();
+    }
+  </script>
+</body>
+</html>
+<!-- partial -->
+  
+</body>
+</html>
